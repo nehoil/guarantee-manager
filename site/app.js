@@ -1,43 +1,29 @@
 const translations = {
   he: {
-    appName: 'Guarantee Manager',
+    appName: 'האחריות של ליאור',
     theme: 'מצב כהה',
     themeLight: 'מצב בהיר',
     eyebrow: 'רשימת לונג׳ביטי שמחזירה אהבה לכסף שלך',
     browse: 'לראות המלצות',
-    managedBy: 'מנוהל דרך בוט טלגרם פשוט',
     badgeTop: 'כסף בחזרה',
     badgeMain: 'מובטח',
-    cmsTitle: 'CMS קטן, שימושי, בלי כאב ראש',
-    cmsBody: 'מנהלים שולחים קישור מוצר לבוט. Guarantee Manager מושך תמונה, כותרת ותיאור, ואז מאפשר לאשר, לערוך ולפרסם לרשימה.',
-    adminRole: 'אדמין בוט',
-    adminRoleText: 'מוסיף מנהלים, מסיר אותם וקובע הרשאות CRUD.',
-    managerRole: 'מנהל עמוד',
-    managerRoleText: 'מוסיף, עורך ומסדר מוצרים לפי ההרשאות.',
     picksEyebrow: 'בחירות ראשונות',
     picksTitle: 'דברים קטנים שעושים טוב',
     visit: 'למוצר',
-    footer: 'POC — מוכן ל-GitHub Pages, מחובר בהמשך לבוט.'
+    footer: 'נבחר באהבה — מוצרים קטנים עם ערך גדול.'
   },
   en: {
-    appName: 'Guarantee Manager',
+    appName: "Lior's Guarantee",
     theme: 'Dark mode',
     themeLight: 'Light mode',
     eyebrow: 'A longevity list that gives your money some love back',
     browse: 'Browse picks',
-    managedBy: 'Managed by a simple Telegram bot',
     badgeTop: 'Money back',
     badgeMain: 'Guaranteed',
-    cmsTitle: 'Tiny CMS, useful, no headache',
-    cmsBody: 'Managers send a product link to the bot. Guarantee Manager fetches image, title, and description, then lets them approve, edit, and publish to the list.',
-    adminRole: 'Bot admin',
-    adminRoleText: 'Adds/removes managers and controls CRUD permissions.',
-    managerRole: 'Page manager',
-    managerRoleText: 'Adds, edits, and organizes products within their permissions.',
     picksEyebrow: 'First picks',
     picksTitle: 'Small things that do good',
     visit: 'View item',
-    footer: 'POC — GitHub Pages ready, bot-connected next.'
+    footer: 'Curated with care — small products with big everyday value.'
   }
 };
 

@@ -186,30 +186,8 @@ html[dir="rtl"] .badge-ring { transform: rotate(5deg); }
 .badge-ring span { font-weight: 1000; }
 .guarantee-card p { margin: 26px 0 0; color: var(--muted); font-weight: 800; font-size: 1.08rem; max-width: 390px; }
 
-.manager-preview {
-  display: grid;
-  grid-template-columns: 0.8fr 1.2fr;
-  gap: 22px;
-  padding: 28px;
-  border: 1px solid var(--card-border);
-  border-radius: 34px;
-  background: var(--card);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(20px);
-}
-
 h2 { margin: 0; font-size: clamp(2rem, 4vw, 3.2rem); letter-spacing: -0.06em; }
-.manager-preview p, .item-card p { color: var(--muted); line-height: 1.65; }
-.role-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-.role-cards article {
-  padding: 22px;
-  border-radius: 26px;
-  background: rgba(255, 255, 255, 0.36);
-  border: 1px solid var(--card-border);
-}
-body[data-theme="dark"] .role-cards article { background: rgba(255, 255, 255, 0.05); }
-.role-cards span { font-size: 2rem; }
-.role-cards h3 { margin: 10px 0 6px; font-size: 1.35rem; }
+.item-card p { color: var(--muted); line-height: 1.65; }
 
 .items-section { padding: 74px 0; }
 .section-head { margin-bottom: 24px; }
@@ -242,9 +220,8 @@ footer { width: min(1160px, calc(100% - 32px)); margin: 0 auto 34px; color: var(
 @keyframes floaty { 50% { transform: translate(-12px, -18px) rotate(14deg); } }
 
 @media (max-width: 860px) {
-  .hero, .manager-preview { grid-template-columns: 1fr; }
+  .hero { grid-template-columns: 1fr; }
   .hero { min-height: auto; padding-top: 42px; }
   .guarantee-card { min-height: 390px; }
   .item-grid { grid-template-columns: 1fr; }
-  .role-cards { grid-template-columns: 1fr; }
 }
