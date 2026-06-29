@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lior's Guarantee</title>
+  <meta name="description" content="A playful bilingual longevity product list managed by Guarantee Manager." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+
+  <header class="topbar">
+    <a class="brand" href="#">
+      <span class="brand-mark">₪✓</span>
+      <span data-i18n="appName">Guarantee Manager</span>
+    </a>
+    <nav class="controls" aria-label="Site controls">
+      <button id="themeToggle" class="pill-button" type="button" data-i18n="theme">מצב כהה</button>
+      <button id="langToggle" class="pill-button" type="button">EN</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow" data-i18n="eyebrow">רשימת לונג׳ביטי שמחזירה אהבה לכסף שלך</p>
+        <h1 id="siteName">האחריות של ליאור</h1>
+        <p id="tagline" class="tagline">מוצרים שימושיים בטירוף, שווים את הכסף, ונבחרו לחיים קצת יותר ארוכים וטובים.</p>
+        <div class="hero-actions">
+          <a class="primary-action" href="#items" data-i18n="browse">לראות המלצות</a>
+          <span class="microcopy" data-i18n="managedBy">מנוהל דרך בוט טלגרם פשוט</span>
+        </div>
+      </div>
+
+      <aside class="guarantee-card" aria-label="Money back guarantee">
+        <div class="sunburst">★</div>
+        <div class="badge-ring">
+          <span data-i18n="badgeTop">כסף בחזרה</span>
+          <strong data-i18n="badgeMain">מובטח</strong>
+          <span>30</span>
+        </div>
+        <p id="returnPolicy">לא אהבת? תוך 30 יום מקבלים כסף בחזרה — בלי דרמה.</p>
+      </aside>
+    </section>
+
+    <section class="manager-preview">
+      <div>
+        <h2 data-i18n="cmsTitle">CMS קטן, שימושי, בלי כאב ראש</h2>
+        <p data-i18n="cmsBody">מנהלים שולחים קישור מוצר לבוט. Guarantee Manager מושך תמונה, כותרת ותיאור, ואז מאפשר לאשר, לערוך ולפרסם לרשימה.</p>
+      </div>
+      <div class="role-cards">
+        <article>
+          <span>👑</span>
+          <h3 data-i18n="adminRole">אדמין בוט</h3>
+          <p data-i18n="adminRoleText">מוסיף מנהלים, מסיר אותם וקובע הרשאות CRUD.</p>
+        </article>
+        <article>
+          <span>🛍️</span>
+          <h3 data-i18n="managerRole">מנהל עמוד</h3>
+          <p data-i18n="managerRoleText">מוסיף, עורך ומסדר מוצרים לפי ההרשאות.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="items" class="items-section">
+      <div class="section-head">
+        <p class="eyebrow" data-i18n="picksEyebrow">בחירות ראשונות</p>
+        <h2 data-i18n="picksTitle">דברים קטנים שעושים טוב</h2>
+      </div>
+      <div id="itemGrid" class="item-grid" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer>
+    <span data-i18n="footer">POC — מוכן ל-GitHub Pages, מחובר בהמשך לבוט.</span>
+  </footer>
+
+  <script src="app.js" type="module"></script>
+</body>
+</html>

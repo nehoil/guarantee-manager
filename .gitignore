@@ -1,0 +1,12 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Runtime data
+bot.log
+data/users.json
+data/drafts.json
+
+# OS/editor
+.DS_Store

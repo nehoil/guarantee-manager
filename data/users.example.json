@@ -1,0 +1,16 @@
+{
+  "users": {
+    "5031071610": {
+      "role": "admin",
+      "pages": {
+        "*": ["create", "read", "update", "delete", "publish"]
+      }
+    },
+    "123456789": {
+      "role": "manager",
+      "pages": {
+        "liors-guarantee": ["create", "read", "update", "publish"]
+      }
+    }
+  }
+}

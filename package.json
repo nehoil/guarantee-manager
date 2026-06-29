@@ -1,0 +1,15 @@
+{
+  "name": "guarantee-manager",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Telegram CMS bot + GitHub Pages storefront POC for curated value-for-money longevity products.",
+  "type": "module",
+  "scripts": {
+    "site:serve": "python3 -m http.server 4173 --directory site",
+    "bot:dev": "python3 bot/guarantee_manager_bot.py",
+    "validate": "python3 bot/validate_data.py site/data/store.json && python3 -m py_compile bot/*.py"
+  },
+  "keywords": ["telegram-bot", "cms", "github-pages", "i18n", "longevity"],
+  "author": "Nehoray + Nehobot",
+  "license": "MIT"
+}

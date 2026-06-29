@@ -1,0 +1,92 @@
+{
+  "site": {
+    "id": "liors-guarantee",
+    "name": {
+      "he": "האחריות של ליאור",
+      "en": "Lior's Guarantee"
+    },
+    "tagline": {
+      "he": "מוצרים שימושיים בטירוף, שווים את הכסף, ונבחרו לחיים קצת יותר ארוכים וטובים.",
+      "en": "Wildly useful, value-for-money picks for a longer, better everyday life."
+    },
+    "returnPolicy": {
+      "he": "לא אהבת? תוך 30 יום מקבלים כסף בחזרה — בלי דרמה.",
+      "en": "Not delighted? 30-day money-back returns — no drama."
+    },
+    "currency": "USD"
+  },
+  "items": [
+    {
+      "id": "red-light-panel-mini",
+      "title": {
+        "he": "פאנל אור אדום קומפקטי",
+        "en": "Compact Red Light Panel"
+      },
+      "description": {
+        "he": "פאנל קטן לשגרת ערב רגועה, התאוששות ותחושת וולנס ביתית בלי מחיר מוגזם.",
+        "en": "A small evening-routine panel for recovery vibes and at-home wellness without the scary price tag."
+      },
+      "category": {
+        "he": "התאוששות",
+        "en": "Recovery"
+      },
+      "price": "$39–69",
+      "rating": 4.7,
+      "vendor": "AliExpress",
+      "url": "https://www.aliexpress.com/",
+      "image": "assets/red-light.svg",
+      "badges": {
+        "he": ["שווה כסף", "קטן לבית"],
+        "en": ["Value pick", "Home friendly"]
+      }
+    },
+    {
+      "id": "sleep-mask-cooling",
+      "title": {
+        "he": "מסכת שינה מקררת",
+        "en": "Cooling Sleep Mask"
+      },
+      "description": {
+        "he": "שדרוג זול לשינה: חושך מוחלט, מגע נעים, ואפשרות לקירור קל אחרי יום ארוך.",
+        "en": "A cheap sleep upgrade: full darkness, soft touch, and optional cooling after a long day."
+      },
+      "category": {
+        "he": "שינה",
+        "en": "Sleep"
+      },
+      "price": "$8–18",
+      "rating": 4.8,
+      "vendor": "AliExpress",
+      "url": "https://www.aliexpress.com/",
+      "image": "assets/sleep-mask.svg",
+      "badges": {
+        "he": ["שינה טובה", "זול וחכם"],
+        "en": ["Better sleep", "Cheap win"]
+      }
+    },
+    {
+      "id": "electrolyte-bottle",
+      "title": {
+        "he": "בקבוק מים עם תזכורת שתייה",
+        "en": "Hydration Reminder Bottle"
+      },
+      "description": {
+        "he": "בקבוק פשוט עם סימוני זמן שעוזר לשתות יותר מים בלי אפליקציה ובלי להסתבך.",
+        "en": "A simple time-marked bottle that nudges hydration without another app or gadget rabbit hole."
+      },
+      "category": {
+        "he": "הרגלים",
+        "en": "Habits"
+      },
+      "price": "$10–24",
+      "rating": 4.6,
+      "vendor": "Amazon / AliExpress",
+      "url": "https://www.aliexpress.com/",
+      "image": "assets/bottle.svg",
+      "badges": {
+        "he": ["הרגל יומי", "קל להתחיל"],
+        "en": ["Daily habit", "Easy start"]
+      }
+    }
+  ]
+}
