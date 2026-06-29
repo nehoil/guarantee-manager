@@ -2,7 +2,7 @@
 
 Telegram CMS bot + GitHub Pages storefront POC.
 
-Bot username: `@Guaranteecmsbot`.
+Bot username: `@Guaranteecsmbot`.
 
 First POC site: **Lior's Guarantee** — bilingual Hebrew/English list of value-for-money longevity items.
 
@@ -26,6 +26,8 @@ npm run bot:dev
 Commands:
 
 - `/help` — show role-aware commands
+- `/he` / `/en` — switch bot language
+- `/mini` — open the Telegram Mini App
 - `/list` — list published products
 - `/drafts` — list drafts
 - send any `https://...` URL — create a product draft
@@ -48,3 +50,18 @@ The bot also shows inline buttons for draft publish/delete and list navigation. 
 - Light/dark mode included.
 - Bot has RBAC + draft/publish skeleton.
 - URL enrichment currently uses best-effort Open Graph scraping; Tavily/LLM adapter is the next step.
+
+## Telegram Mini App
+
+The mini app is served from GitHub Pages at:
+
+`https://nehoil.github.io/guarantee-manager/miniapp/`
+
+It can send these actions back to the bot via `Telegram.WebApp.sendData`:
+
+- create draft from URL
+- edit published item fields
+- delete draft/item
+- deploy public site data
+
+The bot handles the incoming `web_app_data`; no public write API is exposed from the static site.

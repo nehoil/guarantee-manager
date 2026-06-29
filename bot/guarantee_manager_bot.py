@@ -56,6 +56,7 @@ class User:
     telegram_id: str
     role: str
     pages: dict[str, set[str]]
+    lang: str = "he"
 
     def can(self, page_id: str, permission: str) -> bool:
         if self.role == "admin":
@@ -79,6 +80,21 @@ def current_page_id() -> str:
     return store.get("site", {}).get("id", DEFAULT_PAGE_ID)
 
 
+def mini_app_url() -> str:
+    return os.getenv("MINI_APP_URL", "https://nehoil.github.io/guarantee-manager/miniapp/")
+
+
+def set_user_lang(users: dict[str, Any], telegram_id: str, lang: str) -> User:
+    users.setdefault("users", {}).setdefault(telegram_id, {"role": "guest", "pages": {}})
+    users["users"][telegram_id]["lang"] = "he" if lang == "he" else "en"
+    save_json(USERS_PATH, users)
+    return get_user(users, telegram_id)
+
+
+def tr(user: User, he: str, en: str) -> str:
+    return he if user.lang == "he" else en
+
+
 def bootstrap_users() -> dict[str, Any]:
     users = load_json(USERS_PATH, {"users": {}})
     admin_id = os.getenv("ADMIN_TELEGRAM_ID")
@@ -91,9 +107,9 @@ def bootstrap_users() -> dict[str, Any]:
 def get_user(users: dict[str, Any], telegram_id: str) -> User:
     raw = users.get("users", {}).get(telegram_id)
     if not raw:
-        return User(telegram_id, "guest", {})
+        return User(telegram_id, "guest", {}, "he")
     pages = {page: set(perms) for page, perms in raw.get("pages", {}).items()}
-    return User(telegram_id, raw.get("role", "guest"), pages)
+    return User(telegram_id, raw.get("role", "guest"), pages, raw.get("lang", "he"))
 
 
 def esc(value: Any) -> str:
@@ -144,22 +160,64 @@ def answer_callback(callback_id: str, text: str = "") -> None:
 
 
 def keyboard(rows: list[list[tuple[str, str]]]) -> dict[str, Any]:
-    return {"inline_keyboard": [[{"text": text, "callback_data": data} for text, data in row] for row in rows]}
+    inline_rows = []
+    for row in rows:
+        buttons = []
+        for text, data in row:
+            if data.startswith("webapp:"):
+                buttons.append({"text": text, "web_app": {"url": data.removeprefix("webapp:")}})
+            else:
+                buttons.append({"text": text, "callback_data": data})
+        inline_rows.append(buttons)
+    return {"inline_keyboard": inline_rows}
 
 
 def main_menu_keyboard(user: User) -> dict[str, Any]:
-    rows = [[("🛍️ Items", "list:items"), ("🧾 Drafts", "list:drafts")]]
+    rows = [[(tr(user, "🛍️ מוצרים", "🛍️ Items"), "list:items"), (tr(user, "🧾 טיוטות", "🧾 Drafts"), "list:drafts")]]
+    rows.append([(tr(user, "📱 לפתוח מיני־אפליקציה", "📱 Open Mini App"), f"webapp:{mini_app_url()}")])
     if user.role == "admin":
-        rows.append([("👑 Admin help", "help:admin")])
+        rows.append([(tr(user, "👑 עזרת אדמין", "👑 Admin help"), "help:admin")])
     return keyboard(rows)
 
 
 def help_text(user: User) -> str:
+    if user.lang == "he":
+        base = [
+            "<b>Guarantee Manager</b>",
+            "שלחו לינק למוצר ואצור טיוטה עבור Lior’s Guarantee.",
+            "",
+            "<b>פקודות למנהלים</b>",
+            "/mini — לפתוח מיני־אפליקציה לניהול מוצרים",
+            "/list — רשימת מוצרים שפורסמו",
+            "/drafts — רשימת טיוטות",
+            "/addurl &lt;url&gt; — ליצור טיוטה מלינק",
+            "/set &lt;draft_id&gt; &lt;field&gt; &lt;value&gt; — לערוך טיוטה",
+            "/publish &lt;draft_id&gt; — לפרסם טיוטה",
+            "/setitem &lt;item_id&gt; &lt;field&gt; &lt;value&gt; — לערוך מוצר קיים מקומית",
+            "/delete &lt;draft_id|item_id&gt; — למחוק טיוטה/מוצר",
+            "/deploy — לפרוס את שינויי האתר",
+            "/he /en — החלפת שפה",
+            "",
+            "שדות לעריכה: title_he, title_en, desc_he, desc_en, category_he, category_en, price, rating, vendor, url, image, badges_he, badges_en",
+        ]
+        if user.role == "admin":
+            base += [
+                "",
+                "<b>פקודות אדמין</b>",
+                "/addmanager &lt;telegram_id&gt; &lt;page_id&gt; &lt;create,read,update,delete,publish&gt;",
+                "/removemanager &lt;telegram_id&gt;",
+                "/permissions &lt;telegram_id&gt;",
+                "",
+                f"עמוד נוכחי: <code>{esc(current_page_id())}</code>",
+            ]
+        return "\n".join(base)
+
     base = [
         "<b>Guarantee Manager</b>",
         "Send me a product URL and I’ll create a draft for Lior’s Guarantee.",
         "",
         "<b>Manager commands</b>",
+        "/mini — open the Telegram mini app",
         "/list — show published items",
         "/drafts — show product drafts",
         "/addurl &lt;url&gt; — create draft from vendor link",
@@ -168,6 +226,7 @@ def help_text(user: User) -> str:
         "/setitem &lt;item_id&gt; &lt;field&gt; &lt;value&gt; — edit a live item locally",
         "/delete &lt;draft_id|item_id&gt; — delete draft/item if allowed",
         "/deploy — commit + push public site data changes",
+        "/he /en — switch language",
         "",
         "Editable fields: title_he, title_en, desc_he, desc_en, category_he, category_en, price, rating, vendor, url, image, badges_he, badges_en",
     ]
@@ -220,7 +279,7 @@ def list_items() -> str:
 def list_drafts_text() -> str:
     drafts = load_json(DRAFTS_PATH, {"drafts": []}).get("drafts", [])
     if not drafts:
-        return "No drafts yet. Send a product URL to create one."
+        return "אין טיוטות עדיין. שלחו לינק מוצר כדי ליצור אחת."
     lines = ["<b>Drafts</b>", ""]
     for draft in drafts:
         title = draft.get("title", {}).get("en") or draft.get("id")
@@ -233,12 +292,12 @@ def draft_keyboard(draft_id: str, user: User) -> dict[str, Any]:
     rows: list[list[tuple[str, str]]] = []
     row: list[tuple[str, str]] = []
     if user.can(page_id, "publish"):
-        row.append(("✅ Publish", f"draft:publish:{draft_id}"))
+        row.append((tr(user, "✅ לפרסם", "✅ Publish"), f"draft:publish:{draft_id}"))
     if user.can(page_id, "delete"):
-        row.append(("🗑 Delete", f"draft:delete:{draft_id}"))
+        row.append((tr(user, "🗑 למחוק", "🗑 Delete"), f"draft:delete:{draft_id}"))
     if row:
         rows.append(row)
-    rows.append([("🧾 Drafts", "list:drafts"), ("🛍️ Items", "list:items")])
+    rows.append([(tr(user, "🧾 טיוטות", "🧾 Drafts"), "list:drafts"), (tr(user, "🛍️ מוצרים", "🛍️ Items"), "list:items")])
     return keyboard(rows)
 
 
@@ -327,14 +386,14 @@ def find_title(html_text: str) -> str | None:
 def create_draft(user: User, url: str) -> tuple[str, dict[str, Any] | None]:
     page_id = current_page_id()
     if not user.can(page_id, "create"):
-        return "You do not have create permission for this page.", None
+        return tr(user, "אין לך הרשאת יצירה לעמוד הזה.", "You do not have create permission for this page."), None
     if not url.startswith(("http://", "https://")):
-        return "Send a valid product URL starting with http:// or https://", None
+        return tr(user, "שלחו לינק תקין שמתחיל ב־http:// או https://", "Send a valid product URL starting with http:// or https://"), None
     draft = enrich_url(url)
     drafts = load_json(DRAFTS_PATH, {"drafts": []})
     drafts.setdefault("drafts", []).append(draft)
     save_json(DRAFTS_PATH, drafts)
-    return "Draft created.", draft
+    return tr(user, "הטיוטה נוצרה.", "Draft created."), draft
 
 
 def find_draft(draft_id: str) -> dict[str, Any] | None:
@@ -469,6 +528,42 @@ def deploy_changes(user: User, message: str = "content: update store items") -> 
     return "Deployed to GitHub. GitHub Pages will update in a moment."
 
 
+def mini_app_keyboard(user: User) -> dict[str, Any]:
+    return keyboard([[(tr(user, "📱 לפתוח מיני־אפליקציה", "📱 Open Mini App"), f"webapp:{mini_app_url()}")]])
+
+
+def handle_web_app_data(message: dict[str, Any], users: dict[str, Any]) -> bool:
+    web_data = message.get("web_app_data") or {}
+    raw = web_data.get("data")
+    chat_id = message.get("chat", {}).get("id")
+    sender_id = str(message.get("from", {}).get("id", ""))
+    if not raw or not chat_id:
+        return False
+    user = get_user(users, sender_id)
+    try:
+        payload = json.loads(raw)
+    except json.JSONDecodeError:
+        send(chat_id, tr(user, "קיבלתי מידע לא תקין מהמיני־אפליקציה.", "Received invalid mini app data."))
+        return True
+
+    action = payload.get("action")
+    if action == "addurl":
+        msg, draft = create_draft(user, str(payload.get("url", "")).strip())
+        send(chat_id, draft_card(draft) if draft else msg, draft_keyboard(draft["id"], user) if draft else None)
+    elif action == "setitem":
+        item_id = str(payload.get("item_id", "")).strip()
+        field = str(payload.get("field", "")).strip()
+        value = str(payload.get("value", "")).strip()
+        send(chat_id, set_item_field(user, [item_id, field, value]), main_menu_keyboard(user))
+    elif action == "delete":
+        send(chat_id, delete_draft_or_item(user, str(payload.get("target_id", "")).strip()), main_menu_keyboard(user))
+    elif action == "deploy":
+        send(chat_id, deploy_changes(user), main_menu_keyboard(user))
+    else:
+        send(chat_id, tr(user, "פעולה לא מוכרת מהמיני־אפליקציה.", "Unknown mini app action."), main_menu_keyboard(user))
+    return True
+
+
 def handle_callback(update: dict[str, Any], users: dict[str, Any]) -> None:
     query = update.get("callback_query") or {}
     callback_id = query.get("id")
@@ -492,14 +587,14 @@ def handle_callback(update: dict[str, Any], users: dict[str, Any]) -> None:
             edit_message(chat_id, message_id, help_text(user), main_menu_keyboard(user))
         elif data.startswith("draft:publish:"):
             draft_id = data.split(":", 2)[2]
-            answer_callback(callback_id, "Publishing…")
+            answer_callback(callback_id, tr(user, "מפרסם…", "Publishing…"))
             edit_message(chat_id, message_id, publish_draft(user, draft_id), main_menu_keyboard(user))
         elif data.startswith("draft:delete:"):
             draft_id = data.split(":", 2)[2]
-            answer_callback(callback_id, "Deleting…")
+            answer_callback(callback_id, tr(user, "מוחק…", "Deleting…"))
             edit_message(chat_id, message_id, delete_draft_or_item(user, draft_id), main_menu_keyboard(user))
         else:
-            answer_callback(callback_id, "Unknown action")
+            answer_callback(callback_id, tr(user, "פעולה לא מוכרת", "Unknown action"))
     except Exception as exc:  # keep bot responsive during POC
         answer_callback(callback_id, "Error")
         send(chat_id, f"Error: <code>{esc(exc)}</code>")
@@ -509,14 +604,24 @@ def handle_message(update: dict[str, Any], users: dict[str, Any]) -> None:
     message = update.get("message") or {}
     chat_id = message.get("chat", {}).get("id")
     sender_id = str(message.get("from", {}).get("id", ""))
+    if handle_web_app_data(message, users):
+        return
     text = (message.get("text") or "").strip()
     if not chat_id or not text:
         return
     user = get_user(users, sender_id)
     command, *args = text.split()
     try:
-        if command in {"/start", "/help"}:
+        if command == "/he":
+            user = set_user_lang(users, sender_id, "he")
+            send(chat_id, "עברית הופעלה ✅", main_menu_keyboard(user))
+        elif command == "/en":
+            user = set_user_lang(users, sender_id, "en")
+            send(chat_id, "English enabled ✅", main_menu_keyboard(user))
+        elif command in {"/start", "/help"}:
             send(chat_id, help_text(user), main_menu_keyboard(user))
+        elif command == "/mini":
+            send(chat_id, tr(user, "פתחו את המיני־אפליקציה לניהול המוצרים:", "Open the mini app to manage products:"), mini_app_keyboard(user))
         elif command == "/list":
             send(chat_id, list_items(), main_menu_keyboard(user))
         elif command == "/drafts":
@@ -543,7 +648,7 @@ def handle_message(update: dict[str, Any], users: dict[str, Any]) -> None:
         elif command == "/deploy":
             send(chat_id, deploy_changes(user), main_menu_keyboard(user))
         else:
-            send(chat_id, "Unknown command. Try /help", main_menu_keyboard(user))
+            send(chat_id, tr(user, "פקודה לא מוכרת. נסו /help", "Unknown command. Try /help"), main_menu_keyboard(user))
     except subprocess.CalledProcessError as exc:
         detail = exc.stderr or exc.stdout or str(exc)
         send(chat_id, f"Command failed:\n<pre>{esc(detail[-3000:])}</pre>")

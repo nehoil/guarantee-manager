@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Guarantee Manager Mini App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Varela+Round&family=Assistant:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="hero-card">
+      <span class="eyebrow">מיני־אפליקציה</span>
+      <h1>Guarantee Manager</h1>
+      <p>ניהול מהיר של Lior’s Guarantee מתוך טלגרם: שולחים לינק, עורכים מוצרים קיימים, מוחקים ופורסים.</p>
+    </header>
+
+    <section class="panel">
+      <h2>➕ לינק חדש</h2>
+      <label for="urlInput">לינק מוצר</label>
+      <textarea id="urlInput" rows="3" placeholder="https://..."></textarea>
+      <button id="sendUrl" class="primary">ליצור טיוטה בבוט</button>
+      <p class="hint">הבוט ימשוך כותרת/תיאור/תמונה ככל שאפשר ויחזיר טיוטה עם כפתורי Publish/Delete.</p>
+    </section>
+
+    <section class="panel">
+      <div class="section-line">
+        <h2>🛍️ מוצרים קיימים</h2>
+        <button id="refresh" class="small">רענון</button>
+      </div>
+      <div id="items" class="items"></div>
+    </section>
+
+    <section class="panel">
+      <h2>🚀 פריסה</h2>
+      <p class="hint">אחרי עריכת מוצר קיים או מחיקה, לחצו Deploy כדי שהאתר יתעדכן.</p>
+      <button id="deploy" class="danger">Deploy לאתר</button>
+    </section>
+  </main>
+
+  <template id="itemTemplate">
+    <article class="item-card">
+      <div class="thumb"><img alt="" loading="lazy"></div>
+      <div class="body">
+        <strong class="title"></strong>
+        <span class="meta"></span>
+        <details>
+          <summary>עריכה מהירה</summary>
+          <div class="edit-grid">
+            <select class="field">
+              <option value="title_he">כותרת עברית</option>
+              <option value="title_en">כותרת אנגלית</option>
+              <option value="desc_he">תיאור עברית</option>
+              <option value="desc_en">תיאור אנגלית</option>
+              <option value="price">מחיר</option>
+              <option value="vendor">ספק</option>
+              <option value="url">לינק</option>
+              <option value="image">תמונה</option>
+              <option value="badges_he">תגיות עברית, מופרדות בפסיק</option>
+              <option value="badges_en">תגיות אנגלית, מופרדות בפסיק</option>
+            </select>
+            <textarea class="value" rows="2" placeholder="ערך חדש"></textarea>
+            <button class="save">שליחת עריכה לבוט</button>
+            <button class="delete">מחיקה</button>
+          </div>
+        </details>
+      </div>
+    </article>
+  </template>
+
+  <div id="toast"></div>
+  <script src="app.js" type="module"></script>
+</body>
+</html>
