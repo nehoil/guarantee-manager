@@ -25,13 +25,21 @@ npm run bot:dev
 
 Commands:
 
-- `/help`
-- `/list`
-- `/addurl <url>`
-- `/publish <draft_id>`
+- `/help` — show role-aware commands
+- `/list` — list published products
+- `/drafts` — list drafts
+- send any `https://...` URL — create a product draft
+- `/addurl <url>` — create a product draft
+- `/set <draft_id> <field> <value>` — edit draft fields
+- `/publish <draft_id>` — publish draft into `site/data/store.json`
+- `/setitem <item_id> <field> <value>` — edit a published item locally
+- `/delete <draft_id|item_id>` — delete a draft or published item
+- `/deploy` — validate, commit, and push public site data
 - `/addmanager <telegram_id> <page_id> <create,read,update,delete,publish>`
 - `/removemanager <telegram_id>`
 - `/permissions <telegram_id>`
+
+The bot also shows inline buttons for draft publish/delete and list navigation. Runtime files `data/users.json` and `data/drafts.json` are intentionally gitignored.
 
 ## Current status
 
