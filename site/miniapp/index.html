@@ -15,15 +15,16 @@
     <header class="hero-card">
       <span class="eyebrow">מיני־אפליקציה</span>
       <h1>Guarantee Manager</h1>
-      <p>ניהול מהיר של Lior’s Guarantee מתוך טלגרם: שולחים לינק, עורכים מוצרים קיימים, מוחקים ופורסים.</p>
+      <p>ניהול מהיר של Lior’s Guarantee מתוך טלגרם: יוצרים טיוטה, מאשרים לפרסום, והבוט פורס אוטומטית לאתר.</p>
     </header>
 
     <section class="panel">
       <h2>➕ לינק חדש</h2>
       <label for="urlInput">לינק מוצר</label>
       <textarea id="urlInput" rows="3" placeholder="https://..."></textarea>
-      <button id="sendUrl" class="primary">ליצור טיוטה בבוט</button>
-      <p class="hint">הבוט ימשוך כותרת/תיאור/תמונה ככל שאפשר ויחזיר טיוטה עם כפתורי Publish/Delete.</p>
+      <button id="previewUrl" class="primary">ליצור טיוטה כאן</button>
+      <div id="draftPreview" class="draft-preview hidden"></div>
+      <p class="hint">הטיוטה מוצגת כאן לאישור. אחרי אישור, הבוט יעשיר את המידע, יפרסם ויעשה deploy אוטומטי.</p>
     </section>
 
     <section class="panel">
@@ -36,8 +37,8 @@
 
     <section class="panel">
       <h2>🚀 פריסה</h2>
-      <p class="hint">אחרי עריכת מוצר קיים או מחיקה, לחצו Deploy כדי שהאתר יתעדכן.</p>
-      <button id="deploy" class="danger">Deploy לאתר</button>
+      <p class="hint">בפעולות מהמיני־אפליקציה הפריסה אוטומטית. הכפתור הזה נשאר רק כגיבוי ידני.</p>
+      <button id="deploy" class="danger">Deploy ידני</button>
     </section>
   </main>
 
@@ -63,8 +64,8 @@
               <option value="badges_en">תגיות אנגלית, מופרדות בפסיק</option>
             </select>
             <textarea class="value" rows="2" placeholder="ערך חדש"></textarea>
-            <button class="save">שליחת עריכה לבוט</button>
-            <button class="delete">מחיקה</button>
+            <button class="save">שמירה + Deploy</button>
+            <button class="delete">מחיקה + Deploy</button>
           </div>
         </details>
       </div>

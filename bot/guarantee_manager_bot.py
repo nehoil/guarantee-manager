@@ -462,19 +462,12 @@ def set_item_field(user: User, args: list[str]) -> str:
     return f"Updated live item {esc(field)} for <code>{esc(item_id)}</code> locally. Run /deploy to push it live."
 
 
-def publish_draft(user: User, draft_id: str) -> str:
-    page_id = current_page_id()
-    if not user.can(page_id, "publish"):
-        return "You do not have publish permission for this page."
+def insert_item_from_draft(draft: dict[str, Any]) -> str:
     store = load_json(DATA_PATH, {})
-    drafts = load_json(DRAFTS_PATH, {"drafts": []})
-    draft = next((d for d in drafts.get("drafts", []) if d.get("id") == draft_id), None)
-    if not draft:
-        return "Draft not found."
     item = dict(draft)
     item.pop("status", None)
     item.pop("createdAt", None)
-    base_id = slugify(item.get("title", {}).get("en") or item.get("url") or draft_id)
+    base_id = slugify(item.get("title", {}).get("en") or item.get("url") or item.get("id", ""))
     existing_ids = {i.get("id") for i in store.get("items", [])}
     item_id = base_id
     suffix = 2
@@ -483,13 +476,48 @@ def publish_draft(user: User, draft_id: str) -> str:
         suffix += 1
     item["id"] = item_id
     store.setdefault("items", []).insert(0, item)
-    drafts["drafts"] = [d for d in drafts.get("drafts", []) if d.get("id") != draft_id]
     save_json(DATA_PATH, store)
+    return item_id
+
+
+def publish_draft(user: User, draft_id: str) -> str:
+    page_id = current_page_id()
+    if not user.can(page_id, "publish"):
+        return tr(user, "אין לך הרשאת פרסום לעמוד הזה.", "You do not have publish permission for this page.")
+    drafts = load_json(DRAFTS_PATH, {"drafts": []})
+    draft = next((d for d in drafts.get("drafts", []) if d.get("id") == draft_id), None)
+    if not draft:
+        return tr(user, "טיוטה לא נמצאה.", "Draft not found.")
+    item_id = insert_item_from_draft(draft)
+    drafts["drafts"] = [d for d in drafts.get("drafts", []) if d.get("id") != draft_id]
     save_json(DRAFTS_PATH, drafts)
     if os.getenv("AUTO_DEPLOY_ON_PUBLISH", "false").lower() == "true":
         deploy_result = deploy_changes(user, f"content: publish {item_id}")
-        return f"Published <code>{esc(item_id)}</code>.\n\n{deploy_result}"
-    return f"Published <code>{esc(item_id)}</code> locally. Run /deploy to push it live."
+        return f"{tr(user, 'פורסם', 'Published')} <code>{esc(item_id)}</code>.\n\n{deploy_result}"
+    return f"{tr(user, 'פורסם מקומית', 'Published locally')} <code>{esc(item_id)}</code>. {tr(user, 'הריצו /deploy כדי לפרסם באתר.', 'Run /deploy to push it live.')}"
+
+
+def publish_url_from_miniapp(user: User, url: str) -> str:
+    page_id = current_page_id()
+    if not user.can(page_id, "create") or not user.can(page_id, "publish"):
+        return tr(user, "צריך הרשאות יצירה ופרסום לפעולה הזו.", "Create and publish permissions are required for this action.")
+    if not url.startswith(("http://", "https://")):
+        return tr(user, "לינק לא תקין.", "Invalid URL.")
+    draft = enrich_url(url)
+    item_id = insert_item_from_draft(draft)
+    deploy_result = deploy_changes(user, f"content: publish {item_id}")
+    return f"{tr(user, 'אושר, פורסם ונשלח לפריסה', 'Approved, published and deployed')} <code>{esc(item_id)}</code>.\n\n{deploy_result}"
+
+
+def maybe_auto_deploy(user: User, result: str, message: str) -> str:
+    if "locally" not in result and "מקומית" not in result:
+        return result
+    try:
+        deploy_result = deploy_changes(user, message)
+    except subprocess.CalledProcessError as exc:
+        detail = exc.stderr or exc.stdout or str(exc)
+        return f"{result}\n\nDeploy failed:\n<pre>{esc(detail[-2000:])}</pre>"
+    return f"{result}\n\n{deploy_result}"
 
 
 def delete_draft_or_item(user: User, target_id: str) -> str:
@@ -550,13 +578,22 @@ def handle_web_app_data(message: dict[str, Any], users: dict[str, Any]) -> bool:
     if action == "addurl":
         msg, draft = create_draft(user, str(payload.get("url", "")).strip())
         send(chat_id, draft_card(draft) if draft else msg, draft_keyboard(draft["id"], user) if draft else None)
+    elif action == "publish_url":
+        send(chat_id, publish_url_from_miniapp(user, str(payload.get("url", "")).strip()), main_menu_keyboard(user))
     elif action == "setitem":
         item_id = str(payload.get("item_id", "")).strip()
         field = str(payload.get("field", "")).strip()
         value = str(payload.get("value", "")).strip()
-        send(chat_id, set_item_field(user, [item_id, field, value]), main_menu_keyboard(user))
+        result = set_item_field(user, [item_id, field, value])
+        if payload.get("auto_deploy", True):
+            result = maybe_auto_deploy(user, result, f"content: update {item_id}")
+        send(chat_id, result, main_menu_keyboard(user))
     elif action == "delete":
-        send(chat_id, delete_draft_or_item(user, str(payload.get("target_id", "")).strip()), main_menu_keyboard(user))
+        target_id = str(payload.get("target_id", "")).strip()
+        result = delete_draft_or_item(user, target_id)
+        if payload.get("auto_deploy", True):
+            result = maybe_auto_deploy(user, result, f"content: delete {target_id}")
+        send(chat_id, result, main_menu_keyboard(user))
     elif action == "deploy":
         send(chat_id, deploy_changes(user), main_menu_keyboard(user))
     else:

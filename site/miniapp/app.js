@@ -5,6 +5,8 @@ tg?.expand();
 const $ = (sel) => document.querySelector(sel);
 const itemsEl = $('#items');
 const template = $('#itemTemplate');
+const draftPreview = $('#draftPreview');
+let pendingDraftUrl = '';
 
 function toast(text) {
   const node = $('#toast');
@@ -29,6 +31,43 @@ function localized(value, lang = 'he') {
   return value?.[lang] || value?.en || value?.he || '';
 }
 
+function vendorFromUrl(url) {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return 'vendor';
+  }
+}
+
+function showDraftPreview(url) {
+  pendingDraftUrl = url;
+  const vendor = vendorFromUrl(url);
+  draftPreview.classList.remove('hidden');
+  draftPreview.innerHTML = `
+    <article class="local-draft">
+      <span class="draft-badge">טיוטה לאישור</span>
+      <h3>${vendor}</h3>
+      <p>${url}</p>
+      <div class="draft-actions">
+        <button id="approveDraft" class="primary">Approve + Publish + Deploy</button>
+        <button id="discardDraft">ביטול</button>
+      </div>
+      <p class="hint">הבוט יעשיר כותרת/תיאור/תמונה בזמן הפרסום. בעתיד נחבר API כדי להציג enrichment מלא כבר כאן.</p>
+    </article>
+  `;
+  $('#approveDraft').addEventListener('click', () => {
+    send('publish_url', { url: pendingDraftUrl, auto_deploy: true });
+    draftPreview.classList.add('hidden');
+    draftPreview.innerHTML = '';
+    $('#urlInput').value = '';
+  });
+  $('#discardDraft').addEventListener('click', () => {
+    pendingDraftUrl = '';
+    draftPreview.classList.add('hidden');
+    draftPreview.innerHTML = '';
+  });
+}
+
 async function loadItems() {
   itemsEl.innerHTML = '<p class="hint">טוען…</p>';
   const res = await fetch('../data/store.json', { cache: 'no-store' });
@@ -44,19 +83,21 @@ async function loadItems() {
       const field = node.querySelector('.field').value;
       const value = node.querySelector('.value').value.trim();
       if (!value) return toast('צריך להזין ערך');
-      send('setitem', { item_id: item.id, field, value });
+      send('setitem', { item_id: item.id, field, value, auto_deploy: true });
     });
     node.querySelector('.delete').addEventListener('click', () => {
-      if (confirm(`למחוק את ${localized(item.title)}?`)) send('delete', { target_id: item.id });
+      if (confirm(`למחוק את ${localized(item.title)}?`)) {
+        send('delete', { target_id: item.id, auto_deploy: true });
+      }
     });
     itemsEl.appendChild(node);
   });
 }
 
-$('#sendUrl').addEventListener('click', () => {
+$('#previewUrl').addEventListener('click', () => {
   const url = $('#urlInput').value.trim();
   if (!url.startsWith('http://') && !url.startsWith('https://')) return toast('לינק לא תקין');
-  send('addurl', { url });
+  showDraftPreview(url);
 });
 $('#deploy').addEventListener('click', () => send('deploy'));
 $('#refresh').addEventListener('click', loadItems);

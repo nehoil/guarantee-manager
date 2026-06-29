@@ -59,9 +59,12 @@ The mini app is served from GitHub Pages at:
 
 It can send these actions back to the bot via `Telegram.WebApp.sendData`:
 
-- create draft from URL
-- edit published item fields
-- delete draft/item
-- deploy public site data
+- create a local draft preview from URL
+- approve draft, then the bot enriches/publishes/deploys automatically
+- edit published item fields with auto-deploy
+- delete draft/item with auto-deploy
+- manual deploy fallback
 
 The bot handles the incoming `web_app_data`; no public write API is exposed from the static site.
+
+Note: the static Mini App shows a local approval preview. Vendor enrichment and GitHub writes happen inside the Telegram bot because it is the trusted backend and avoids browser CORS/vendor blocking issues.
