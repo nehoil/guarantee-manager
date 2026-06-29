@@ -5,11 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Lior's Guarantee</title>
   <meta name="description" content="A playful bilingual longevity product list with value-for-money wellness picks." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Varela+Round&family=Assistant:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="orb orb-a"></div>
-  <div class="orb orb-b"></div>
+  <div class="confetti confetti-a">✦</div>
+  <div class="confetti confetti-b">●</div>
+  <div class="confetti confetti-c">₪</div>
 
   <header class="topbar">
     <a class="brand" href="#">
@@ -28,6 +32,7 @@
         <p class="eyebrow" data-i18n="eyebrow">רשימת לונג׳ביטי שמחזירה אהבה לכסף שלך</p>
         <h1 id="siteName">האחריות של ליאור</h1>
         <p id="tagline" class="tagline">מוצרים שימושיים בטירוף, שווים את הכסף, ונבחרו לחיים קצת יותר ארוכים וטובים.</p>
+        <div class="spark-row">🌿 ✨ 💸 ✨ 🌞</div>
         <div class="hero-actions">
           <a class="primary-action" href="#items" data-i18n="browse">לראות המלצות</a>
         </div>
@@ -46,8 +51,8 @@
 
     <section id="items" class="items-section">
       <div class="section-head">
+        <h2><span class="emoji-bubble">🛍️</span><span data-i18n="picksTitle">דברים קטנים שעושים טוב</span><span class="stripe"></span></h2>
         <p class="eyebrow" data-i18n="picksEyebrow">בחירות ראשונות</p>
-        <h2 data-i18n="picksTitle">דברים קטנים שעושים טוב</h2>
       </div>
       <div id="itemGrid" class="item-grid" aria-live="polite"></div>
     </section>
